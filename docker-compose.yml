@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=mysite
+    env_file:
+      - ./.env-example
+    ports:
+      - "5432:5432"
+
+  elasticsearch:
+    image: elasticsearch:7.17.13
+    environment:
+      - "bootstrap.memory_lock=true"
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms128m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+
+  mysite:
+    build:
+      context: .
+    command: >
+        bash -c "sleep 10; \
+                 poetry run python manage.py migrate && \
+                 poetry run python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - postgres
+      - elasticsearch
+    volumes:
+      - .:/usr/src:z
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env-example

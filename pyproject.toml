@@ -1,0 +1,110 @@
+[tool.poetry]
+name = "mysite"
+version = "1.0.0"
+description = "A peculiar Django app"
+authors = ["Samuel Herrero <samuel.herrero@feedzai.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^4.2.6"
+djangorestframework = "^3.14.0"
+elasticsearch-dsl = "^8.9.0"
+psycopg2-binary = "^2.9.9"
+django-extensions = "^3.2.3"
+django-rest-framework = "^0.1.0"
+djangorestframework-simplejwt = "^5.3.1"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.1"
+flake8 = "^7.0.0"
+flake8-pyproject = "^1.2.3"
+pytest = "^8.2.0"
+pytest-sugar = "^1.0.0"
+pytest-mock = "^3.14.0"
+pytest-xdist = "^3.6.1"
+pytest-cov = "^5.0.0"
+coverage = "^7.5.1"
+black = "^24.4.2"
+pytest-django = "^4.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+# ==== pytest ====
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--ds=mysite.settings --reuse-db"
+python_files = [
+    "tests.py",
+    "test_*.py",
+]
+env = [
+    "DJANGO_SETTINGS_MODULE=mysite.settings",
+]
+filterwarnings = [
+     "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
+]
+
+# ==== Coverage ====
+[tool.coverage.run]
+parallel = true
+include = ["mysite/**"]
+omit = [
+    "*/migrations/*",
+    "*/scripts/*",
+    "*/templates/*",
+    "*/.venv/*",
+    "*/tests/*",
+    "*/conftest.py",
+    "*/apps.py",
+    "*/urls.py",
+    "*/asgi.py",
+    "*/settings/*",
+    "*/wsgi.py",
+    "*/manage.py"
+]
+plugins = ["django_coverage_plugin"]
+
+[tool.coverage.report]
+fail_under = 50.00
+precision = 2
+show_missing = true
+ignore_errors = true
+skip_covered = true
+skip_empty = true
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self.debug",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc.)?abstractmethod",
+]
+
+# ==== black ====
+[tool.black]
+line-length = 119
+target-version = ['py311']
+experimental-string-processing = true
+include = '\.pyi?$'
+exclude = '''
+/(
+  \.toml
+  |\.sh
+  |\.git
+  |\.ini
+  |Dockerfile
+  |\.tox
+  |\.env
+)/
+'''
