@@ -6,5 +6,5 @@ from mysite.apps.authentication import views
 urlpatterns = [
     path("token/", views.CustomObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("logout/", views.LogoutView.as_view(), name="logout_api"),
 ]

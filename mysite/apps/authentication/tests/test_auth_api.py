@@ -5,8 +5,8 @@ from rest_framework.test import APIClient
 
 from mysite.apps.users.models import User
 
-LOGOUT_URL = reverse("api:logout")
-TOKEN_URL = reverse("api:token_obtain_pair")
+LOGOUT_URL = reverse("logout_api")
+TOKEN_URL = reverse("token_obtain_pair")
 
 
 def create_user(**params) -> User:
@@ -19,7 +19,7 @@ class TestAuthApi:
 
     def test_user_can_login(self, api_client: APIClient, user: User):
         """Test that user login success with valid credentials"""
-        payload = {"username": "jvss", "password": "test123", "name": "jose"}
+        payload = {"username": "jvss", "password": "test123", "first_name": "jose"}
         create_user(**payload)
         res = api_client.post(TOKEN_URL, payload)
 
