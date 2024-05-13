@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 import environ
 
@@ -48,11 +49,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "drf_spectacular",
     "mysite.apps.authentication",
     "mysite.apps.core",
     "mysite.apps.users",
     "mysite.apps.elastic",
-    "mysite.apps.proxy",
 ]
 
 MIDDLEWARE = [
@@ -173,6 +174,8 @@ LOGGING = {
 }
 
 ES_INDEX_NAME = env("ES_INDEX_NAME")
+ES_HOSTNAME = env("ES_HOSTNAME")
+ES_PORT = env.int("ES_PORT")
 
 AUTH_USER_MODEL = "users.User"
 
@@ -180,10 +183,27 @@ AUTH_USER_MODEL = "users.User"
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=14),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=21),
+    "AUTH_COOKIE": "access_token",  # Cookie name. Enables cookies if value is set.
+    "REFRESH_COOKIE": "refresh_token",
+    "AUTH_COOKIE_DOMAIN": None,  # A string like "example.com", or None for standard domain cookie.
+    "AUTH_COOKIE_SECURE": False,  # Whether the auth cookies should be secure (https:// only).
+    "AUTH_COOKIE_HTTP_ONLY": True,  # Http only cookie flag. It's not fetch by javascript.
+    "AUTH_COOKIE_PATH": "/",  # The path of the auth cookie.
+    "AUTH_COOKIE_SAMESITE": "Lax",  # Whether to set the flag restricting cookie leaks on cross-site requests.
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "My Site API",
+    "DESCRIPTION": "User management system",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
 }

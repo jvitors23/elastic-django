@@ -1,5 +1,4 @@
 from django.conf import settings
-from datetime import datetime
 from elasticsearch_dsl import Document, Date, Keyword, Float, Nested, InnerDoc
 
 
@@ -13,7 +12,7 @@ class MySiteDocument(Document):
     user = Nested(User)
     request_id = Keyword()
     alerts = Keyword(multi=True)
-    IP = Keyword()
+    ip_address = Keyword()
     user_agent = Keyword()
     timestamp = Date()
 
@@ -22,7 +21,3 @@ class MySiteDocument(Document):
         settings = {
             "number_of_shards": 2,
         }
-
-    def save(self, **kwargs):
-        self.timestamp = datetime.now()
-        return super(MySiteDocument, self).save(**kwargs)

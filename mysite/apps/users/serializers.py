@@ -1,4 +1,5 @@
-from django.contrib.auth import password_validation
+from typing import Dict
+
 from rest_framework import serializers
 
 from mysite.apps.users.models import User
@@ -17,14 +18,14 @@ class UserSerializer(serializers.ModelSerializer):
             "email",
             "password",
         )
-        read_only_fields = ("id", "username")
-        extra_kwargs = {"password": {"write_only": True}}
+        read_only_fields = ("id",)
+        extra_kwargs = {"password": {"write_only": True, "min_length": 8}}
 
-    def validate_password(self, value):
-        password_validation.validate_password(value, self.instance)
-        return value
+    def create(self, validated_data: Dict) -> User:
+        """Create a new user with encrypted password and return it"""
+        return User.objects.create_user(**validated_data)
 
-    def update(self, instance: User, validated_data: dict) -> User:
+    def update(self, instance: User, validated_data: Dict) -> User:
         """Update a user, setting the password correctly and return it"""
         password = validated_data.pop("password", None)
         user = super().update(instance, validated_data)
