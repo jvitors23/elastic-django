@@ -41,3 +41,7 @@ class MySiteDocumentSerializer(serializers.Serializer):
     class Meta:
         read_only_fields = ("id", "timestamp")
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class ListDocumentsSerializer(serializers.Serializer):
+    timestamp = serializers.DateTimeField(required=True)

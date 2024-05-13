@@ -3,14 +3,13 @@ from datetime import datetime, timedelta
 from rest_framework.mixins import UpdateModelMixin, CreateModelMixin, ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
-from rest_framework import status
 from elasticsearch import NotFoundError
 from django.http import Http404
 from drf_spectacular.utils import OpenApiParameter
 from drf_spectacular.views import extend_schema
 
 from mysite.apps.elastic.models import MySiteDocument
-from mysite.apps.elastic.serializers import MySiteDocumentSerializer
+from mysite.apps.elastic.serializers import MySiteDocumentSerializer, ListDocumentsSerializer
 
 
 class MySiteDocumentViewSet(
@@ -38,26 +37,14 @@ class MySiteDocumentViewSet(
         description="More descriptive text",
     )
     def list(self, request, *args, **kwargs):
-        timestamp = self.request.GET.get("timestamp", None)
-
-        if timestamp is None:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={"message": "You must provide a timestamp for querying documents."},
-            )
-
-        try:
-            datetime_object = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
-        except Exception:  # noqa: E722
-            return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Invalid timestamp."})
-
-        queryset = self.get_queryset(datetime_object)
-        print(queryset)
-
+        serializer = ListDocumentsSerializer(data=self.request.GET)
+        serializer.is_valid(raise_exception=True)
+        timestamp = serializer.validated_data["timestamp"]
+        queryset = self.get_queryset(timestamp)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def get_queryset(self, datetime_object):
+    def get_queryset(self, datetime_object: datetime):
         return (
             MySiteDocument.search()
             .filter(
